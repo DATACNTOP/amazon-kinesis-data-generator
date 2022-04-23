@@ -38,16 +38,33 @@ exports.createPoolAndUser = function(event, context) {
         setIdentityPoolRoles,
         updateRoles
     ], function (err, result) {
+        
+        var respMsg = "";
+        var response = "";
+        
         if(err) {
             console.log(err);
-            sendResponse(event, context, "FAILED", err);
+            respMsg = "FAILED";
+            // sendResponse(event, context, "FAILED", err);
         }
         else {
-            var response = {
+            response = {
                 Querystring: "upid=" + userPoolId + "&ipid=" + identityPoolId + "&cid=" + clientAppId + "&r=" + region
             };
 
-            sendResponse(event, context, "SUCCESS", response);
+            respMsg = "SUCCESS";
+
+            // sendResponse(event, context, "SUCCESS", response);
+        }
+        
+        if(event.URLPrefix){
+            // invoke by Console or CLI
+            console.log(respMsg, response);
+            console.log("======== KinesisDataGeneratorUrl ======");
+            console.log(event.URLPrefix + response.Querystring);
+        } else {
+            // CloudFormation
+            sendResponse(event, context, respMsg, response);
         }
 
     });
